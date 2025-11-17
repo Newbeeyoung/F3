@@ -110,7 +110,8 @@ def main(args):
             })
 
             torchvision.utils.save_image(purify_image, os.path.join(args.image_dir, "{}_purify.png".format(image_path[0])))
-    
+        if n==100:
+            break
     save_result(clean_result, args.output_dir, 'clean_result_original')
     if len(attack_result)>0:
         save_result(attack_result, args.output_dir, 'adv_result_original')
@@ -134,7 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('--distributed', default=True, type=bool)
     
     # model config
-    parser.add_argument('--huggingface_root', default="/root/huggingface_model", type=str)
+    parser.add_argument('--huggingface_root', default="liuhaotian", type=str)
    
     # dataset config
     parser.add_argument('--annotation_file', required=True, type=str)

@@ -1,0 +1,4 @@
+output_llava_7b/
+_pycache_/
+nohup.out
+*.pyc

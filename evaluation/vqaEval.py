@@ -69,6 +69,11 @@ class VQAEval:
 	def evaluate(self, quesIds=None):
 		if quesIds == None:
 			quesIds = [quesId for quesId in self.params['question_id']]
+		# Filter to only include question IDs that exist in both ground truth and results
+		availableQuesIds = [quesId for quesId in quesIds if quesId in self.vqaRes.qa]
+		if len(availableQuesIds) < len(quesIds):
+			print(f"Warning: Only {len(availableQuesIds)}/{len(quesIds)} question IDs have results. Evaluating on available subset.")
+		quesIds = availableQuesIds
 		gts = {}
 		res = {}
 		for quesId in quesIds:
@@ -81,7 +86,7 @@ class VQAEval:
 		accQA       = []
 		accQuesType = {}
 		accAnsType  = {}
-		print "computing accuracy"
+		print("computing accuracy")
 		step = 0
 		for quesId in quesIds:
 			for ansDic in gts[quesId]['answers']:
@@ -125,7 +130,7 @@ class VQAEval:
 			step = step + 1
 
 		self.setAccuracy(accQA, accQuesType, accAnsType)
-		print "Done computing accuracy"
+		print("Done computing accuracy")
 
 	def processPunctuation(self, inText):
 		outText = inText

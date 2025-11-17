@@ -1,3 +1,43 @@
+Metadata-Version: 2.4
+Name: llava
+Version: 1.2.2.post1
+Summary: Towards GPT-4 like large language and visual assistant.
+Project-URL: Homepage, https://llava-vl.github.io
+Project-URL: Bug Tracker, https://github.com/haotian-liu/LLaVA/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: torch==2.1.2
+Requires-Dist: torchvision==0.16.2
+Requires-Dist: transformers==4.37.2
+Requires-Dist: tokenizers==0.15.1
+Requires-Dist: sentencepiece==0.1.99
+Requires-Dist: shortuuid
+Requires-Dist: accelerate==0.21.0
+Requires-Dist: peft
+Requires-Dist: bitsandbytes
+Requires-Dist: pydantic
+Requires-Dist: markdown2[all]
+Requires-Dist: numpy
+Requires-Dist: scikit-learn==1.2.2
+Requires-Dist: gradio==4.16.0
+Requires-Dist: gradio_client==0.8.1
+Requires-Dist: requests
+Requires-Dist: httpx==0.24.0
+Requires-Dist: uvicorn
+Requires-Dist: fastapi
+Requires-Dist: einops==0.6.1
+Requires-Dist: einops-exts==0.0.4
+Requires-Dist: timm==0.6.13
+Provides-Extra: train
+Requires-Dist: deepspeed==0.12.6; extra == "train"
+Requires-Dist: ninja; extra == "train"
+Requires-Dist: wandb; extra == "train"
+Provides-Extra: build
+Requires-Dist: build; extra == "build"
+Requires-Dist: twine; extra == "build"
+
 ## Fighting Fire with Fire (F3): A Training-free and Efficient Visual Adversarial Example Purification Method in LVLMs
 
 This is a PyTorch implementation of the [F3 paper](https://arxiv.org/abs/2506.01064), which is accepted by ACMMM 2025 as Oral.
@@ -44,7 +84,6 @@ There are one modification to the source code:
 
 For unadaptive autoattack:
 
-**With distributed training (8 GPUs):**
 ```bash
 python -m torch.distributed.run \
     --nproc_per_node 8 --nnodes 1 --node_rank 0 \
@@ -53,34 +92,12 @@ python -m torch.distributed.run \
     --output_dir output_llava_7b/unadaptive_eps16
 ```
 
-**Without distributed training (single GPU):**
-```bash
-python f3_llava.py --annotation_file vqav2_1000.json --attack_method unadaptive --aa_eps 16 --f3_v3 \
-    --output_dir output_llava_7b/unadaptive_eps16
-```
-
-```bash
-python f3_llava_caption.py --attack_method unadaptive --aa_eps 16 --f3_v3 \
-    --coco_images_dir "/home/yichenyu/Dataset/COCO/val2017" --output_dir output_llava_7b/unadaptive_eps16 --limi 10
-```
-```bash
-python f3_llava_caption.py --attack_method targeted --f3_v3 \
-    --coco_images_dir "/home/yichenyu/Dataset/COCO/val2017" --output_dir output_llava_7b/targeted_eps16 --limit 10 --purify_method diffpure
-```
 For adaptive autoattack:
-
-**With distributed training (8 GPUs):**
 ```bash
 python -m torch.distributed.run \
     --nproc_per_node 8 --nnodes 1 --node_rank 0 \
     --master_addr 127.0.0.1 --master_port 25031 \
     f3_llava.py --annotation_file vqav2_1000.json --attack_method adaptive --aa_eps 8 --f3_v3 \
-    --output_dir output_llava_7b/adaptive_eps8
-```
-
-**Without distributed training (single GPU):**
-```bash
-python f3_llava.py --annotation_file vqav2_1000.json --attack_method adaptive --aa_eps 8 --f3_v3 \
     --output_dir output_llava_7b/adaptive_eps8
 ```
 
@@ -100,9 +117,6 @@ First, preprocess the output file.
 ```bash
 python eval_ai_process.py --json_dir output_llava_7b/adaptive_eps8/
 ```
-```bash
-python eval_ai_process.py --json_dir output_llava_7b/unadaptive_eps16/
-```
 
 The meaning of the parameters are as follows:
 
@@ -113,17 +127,7 @@ Second, run the evaluation code. Note that the evaluation code must be executed 
 ```bash
 python eval_f3.py output_llava_7b/adaptive_eps8/
 ```
-```bash
-python eval_f3.py output_llava_7b/unadaptive_eps16/
-```
 
-```bash
-python eval_caption_bleu.py   --result_dir /home/yichenyu/git/F3/output_llava_7b/unadaptive_eps16
-```
-```bash
-python eval_caption_bleu.py   --result_dir /home/yichenyu/git/F3/output_llava_7b/targeted_eps16 \
---universal_reference "A great white shark flying over a bridge"
-```
 ### Result
 
 F3-v3 result on LLaVA-v1.5-7B:
